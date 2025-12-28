@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auto Bingo</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Alpine.js -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;700&display=swap"
+        rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: #FEF3C7;
+            /* Amber 100 */
+        }
+
+        h1 {
+            font-family: 'Fredoka One', cursive;
+        }
+
+        .bingo-card {
+            background-color: #fff;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            border-radius: 1.5rem;
+            border: 8px solid #FCD34D;
+            /* Amber 300 */
+            padding: 1rem;
+        }
+
+        .shuffle-btn,
+        .print-btn {
+            font-family: 'Fredoka One', cursive;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .shuffle-btn:active,
+        .print-btn:active {
+            transform: scale(0.95);
+            box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+        }
+
+        /* Table Grid Styling */
+        .bingo-grid {
+            border: 4px solid #FBBF24;
+            /* Outer border */
+            border-radius: 0.5rem;
+            overflow: hidden;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 2px;
+            background-color: #FBBF24;
+            /* Gap color acts as border */
+        }
+
+        .bingo-cell {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #fff;
+        }
+
+        @media print {
+            body {
+                background: none;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .shuffle-btn,
+            .print-btn {
+                display: none !important;
+            }
+
+            .bingo-card {
+                border: none;
+                box-shadow: none;
+                padding: 0;
+            }
+
+            /* Ensure the yellow gaps (grid lines) are visible */
+            .bingo-grid {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+                border: 4px solid #FBBF24;
+                /* Keep the grid border if desired, or remove if "outer" */
+            }
+        }
+    </style>
+</head>
+
+<body class="min-h-screen flex flex-col items-center justify-center p-4">
+
+    <!-- Header -->
+    <header class="mb-8 text-center">
+        <h1 class="text-6xl text-yellow-500 drop-shadow-lg tracking-wider" style="-webkit-text-stroke: 2px #fff;">AUTO
+            BINGO</h1>
+    </header>
+
+    <!-- Main Content -->
+    <main x-data="bingoGame()" class="flex flex-col md:flex-row items-center gap-8 w-full max-w-6xl justify-center">
+
+        <!-- Bingo Grid -->
+        <div class="bingo-card">
+            <div class="bingo-grid">
+                <template x-for="(image, index) in gridImages" :key="index">
+                    <div class="bingo-cell">
+                        <!-- Image -->
+                        <img :src="image" alt="Bingo Item" class="w-full h-full object-contain p-4">
+                    </div>
+                </template>
+            </div>
+        </div>
+
+        <!-- Controls -->
+        <div class="flex flex-col items-center justify-center gap-6">
+            <button @click="shuffle()"
+                class="shuffle-btn text-white text-2xl px-8 py-4 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 border-b-4 border-purple-700 active:border-purple-500 w-full md:w-auto transform hover:-translate-y-1">
+                🎲 SHUFFLE!
+            </button>
+            <button onclick="window.print()"
+                class="print-btn text-white text-xl px-8 py-3 rounded-full bg-gradient-to-r from-blue-400 to-cyan-400 hover:from-blue-500 hover:to-cyan-500 border-b-4 border-blue-600 active:border-blue-400 w-full md:w-auto transform hover:-translate-y-1">
+                🖨️ PRINT
+            </button>
+        </div>
+
+    </main>
+
+    <script>
+        function bingoGame() {
+            return {
+                allImages: [],
+                gridImages: [],
+
+                init() {
+                    // Generate list of 20 images
+                    // Assuming format bingo_01.png to bingo_20.png based on file listing
+                    for (let i = 1; i <= 20; i++) {
+                        // Pad number with leading zero if needed
+                        const num = i.toString().padStart(2, '0');
+                        this.allImages.push(`assets/auto-bingo/bingo_${num}.png`);
+                    }
+                    this.shuffle();
+                },
+
+                shuffle() {
+                    // Create a copy and shuffle
+                    let shuffled = [...this.allImages].sort(() => 0.5 - Math.random());
+
+                    // Take first 16
+                    this.gridImages = shuffled.slice(0, 16);
+                }
+            }
+        }
+    </script>
+</body>
+
+</html>
